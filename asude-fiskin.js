@@ -284,37 +284,50 @@
 
 
   var products = [];
-  if (products.length === 0) {
-    fetch('https://gist.githubusercontent.com/sevindi/8bcbde9f02c1d4abe112809c974e1f49/raw/9bf93b58df623a9b16f1db721cd0a7a539296cf0/products.json')
-      .then(response => response.json())
-      .then(data => {
-        data.forEach(p => {
-          data = {
-            labelImages: [
-              "https://www.e-bebek.com/assets/images/cok-satan@2x.png",
-              "https://www.e-bebek.com/assets/images/yildiz-urun@2x.png",
-            ],
-            ratingStars: "★★★★★",
-            img: p.img,
-            brand: p.brand,
-            name: p.name,
-            price: p.price,
-            url: p.url,
-            original_price: p.original_price
-          };
+    products = window.localStorage.getItem('products') || "null";
+    if (products.toString() !== "null") {
+      console.log("products found in localStorage");
+      products = JSON.parse(products);
+      products.forEach(p => {
+        const card = createProductCard(p);
+        carouselContainer.appendChild(card);
+      });
+    } else {
+      products = [];
+    }
 
-          if (p.original_price > p.price) {
-            data.discount = (p.original_price - p.price).toFixed(2) + " TL indirim";
-          }
+    if (products.length === 0) {
+      fetch('https://gist.githubusercontent.com/sevindi/8bcbde9f02c1d4abe112809c974e1f49/raw/9bf93b58df623a9b16f1db721cd0a7a539296cf0/products.json')
+        .then(response => response.json())
+        .then(data => {
+          products = [];
+          data.forEach(p => {
+            data = {
+              labelImages: [
+                "https://www.e-bebek.com/assets/images/cok-satan@2x.png",
+                "https://www.e-bebek.com/assets/images/yildiz-urun@2x.png",
+              ],
+              ratingStars: "★★★★★",
+              img: p.img,
+              brand: p.brand,
+              name: p.name,
+              price: p.price,
+              url: p.url,
+              original_price: p.original_price
+            };
 
-          const card = createProductCard(data);
-          carouselContainer.appendChild(card);
-        }); 
-      })
-      .catch(error => console.error('Error fetching products:', error));
-
-    window.localStorage.setItem('products', null);
-  }
+            if (p.original_price > p.price) {
+              data.discount = (p.original_price - p.price).toFixed(2) + " TL indirim";
+            }
+            const card = createProductCard(data);
+            carouselContainer.appendChild(card);
+            products.push(data);
+          });
+          
+          window.localStorage.setItem('products', JSON.stringify(products));
+        })
+        .catch(error => console.error('Error fetching products:', error));
+    }
 
   function createProductCard(product) {
     const card = document.createElement('a');
