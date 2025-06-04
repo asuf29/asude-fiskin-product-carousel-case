@@ -74,9 +74,9 @@
       background-color: white;
       border-radius: 1rem;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      padding: 1rem;
       justify-content: start;
       align-items: center;
+      padding: 1.5rem 0;
     }
 
     .product-card {
@@ -85,11 +85,11 @@
       width: 16rem;
       height: 28rem;
       background-color: white;
-      border-radius: 1rem;
+      border-radius: 10px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       padding: 1rem;
       position: relative;
-      border: 1px solid #e5e7eb;
+      border: 1px solid #ededed;
       
     }
 
@@ -159,7 +159,7 @@
 
     .product-title {
       font-weight: 500;
-      font-size: 0.875rem;
+      font-size: 0.75rem;
       margin-bottom: 0.25rem;
       margin-bottom: 25px;
       color: #7D7D7D;
@@ -181,20 +181,24 @@
     .product-price {
       font-weight: bold;
       font-size: 1.125rem;
-      margin-bottom: 16px;
+      margin-bottom: 1.5rem;
       color: #7D7D7D;
+    }
 
+    .product-price-discounted {
+      font-weight: bold;
+      font-size: 1.125rem;
+      margin-bottom: 1.5rem;
+      color: #00a365;
     }
 
     .product-discount {
-      background-color: #d1fae5;
-      color: #059669;
-      font-size: 0.75rem;
-      font-weight: 500;
-      display: inline-block;
+      color: #00a365;
+      font-size: 1rem;
+      font-weight: bold;
+      display: inline-flex;
+      align-items: center;
       padding: 0.25rem 0.5rem;
-      border-radius: 1rem;
-      margin-bottom: 1.75rem;
     }
 
     .add-to-cart-button {
@@ -317,8 +321,11 @@
             };
 
             if (p.original_price > p.price) {
-              data.discount = (p.original_price - p.price).toFixed(2) + " TL indirim";
+              const discountAmount = p.original_price - p.price;
+              const discountPercent = Math.round((discountAmount / p.original_price) * 100);
+              data.discount = `${discountPercent}%`;
             }
+
             const card = createProductCard(data);
             carouselContainer.appendChild(card);
             products.push(data);
@@ -364,7 +371,7 @@
 
     const title = document.createElement('h3');
     title.className = 'product-title';
-    const titleText = `<strong>${product.brand}</strong> - ${product.name}`;
+    const titleText = "<strong>" + product.brand + "</strong> - " + product.name;
     title.innerHTML = titleText;
     card.appendChild(title);
 
@@ -376,17 +383,51 @@
     rating.appendChild(spanCount);
     card.appendChild(rating);
 
+  if (product.discount && product.original_price) {
+    const originalPriceRow = document.createElement('div');
+    originalPriceRow.style.display = 'flex';
+    originalPriceRow.style.alignItems = 'center';
+    originalPriceRow.style.gap = '0.5rem';
+
+    const originalPrice = document.createElement('span');
+    originalPrice.textContent = product.original_price;
+    originalPrice.style.textDecoration = 'line-through';
+    originalPrice.style.color = '#7D7D7D';
+    originalPrice.style.fontSize = '1.125rem';
+    originalPrice.style.fontWeight = 'bold';
+
+    const discount = document.createElement('span');
+    discount.className = 'product-discount';
+
+    const discountText = document.createElement('span');
+    discountText.textContent = product.discount;
+
+    const discountArrow = document.createElement('span');
+    discountArrow.innerHTML = '&#x2193;';
+    discountArrow.style.backgroundColor = '#00a365';
+    discountArrow.style.color = 'white';
+    discountArrow.style.borderRadius = '1rem';
+    discountArrow.style.padding = '0.2rem 0.4rem';
+    discountArrow.style.marginLeft = '0.25rem';
+    discountArrow.style.display = 'inline-block';
+
+    discount.appendChild(discountText);
+    discount.appendChild(discountArrow);
+
+    originalPriceRow.appendChild(originalPrice);
+    originalPriceRow.appendChild(discount);
+    card.appendChild(originalPriceRow);
+
+    const price = document.createElement('p');
+    price.className = 'product-price-discounted';
+    price.textContent = product.price;
+    card.appendChild(price);
+  } else {
     const price = document.createElement('p');
     price.className = 'product-price';
     price.textContent = product.price;
     card.appendChild(price);
-
-    if (product.discount) {
-      const discount = document.createElement('p');
-      discount.className = 'product-discount';
-      discount.textContent = product.discount;
-      card.appendChild(discount);
-    }
+  }
 
     const addToCartBtn = document.createElement('button');
     addToCartBtn.className = 'add-to-cart-button';
