@@ -1,10 +1,34 @@
-(function () {
-  if (window.location.pathname !== "/" && window.location.pathname !== "/index.html") {
-    console.log("wrong page");
-    return;
-  }
-  const style = document.createElement('style');
-  style.textContent = `
+(() => {
+  const init = () => {
+    if (window.location.pathname !== "/" && window.location.pathname !== "/index.html") {
+      console.log("wrong page");
+      return;
+    }
+    buildHTML();
+    buildCSS();
+    setEvents();
+  };
+
+  const buildHTML = () => {
+    const html = `
+      <div class="container">
+        <div class="carousel">
+          <div class="carousel-header">
+            <h2>Sizin için Seçtiklerimiz</h2>
+          </div>
+          <button class="carousel-arrow left-arrow">‹</button>
+          <button class="carousel-arrow right-arrow">›</button>
+          <div class="carousel-container" id="carouselScroll">
+          </div>
+        </div>
+      </div>
+    `;
+
+    window.document.body.insertAdjacentHTML('beforeend', html);
+  };
+
+  const buildCSS = () => {
+    const css = `
     body {
       background-color: #f3f4f6;
       padding: 1.5rem;
@@ -258,36 +282,17 @@
     a {
       text-decoration: none !important;
     }
-  `;
+    `;
 
-  document.head.appendChild(style);
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode(css));
+    document.head.appendChild(style);
+  };
 
-  const container = document.createElement('div');
-  container.className = 'container';
-
-  const carousel = document.createElement('div');
-  carousel.className = 'carousel';
-
-  const carouselHeader = document.createElement('div');
-  carouselHeader.className = 'carousel-header';
-  const h2 = document.createElement('h2');
-  h2.textContent = 'Sizin için Seçtiklerimiz';
-  carouselHeader.appendChild(h2);
-
-  const leftArrow = document.createElement('button');
-  leftArrow.className = 'carousel-arrow left-arrow';
-  leftArrow.textContent = '‹';
-
-  const rightArrow = document.createElement('button');
-  rightArrow.className = 'carousel-arrow right-arrow';
-  rightArrow.textContent = '›';
-
-  const carouselContainer = document.createElement('div');
-  carouselContainer.className = 'carousel-container';
-  carouselContainer.id = 'carouselScroll';
-
-
-  var products = [];
+  const setEvents = () => {
+    carouselContainer = document.getElementById('carouselScroll');
+    var products = [];
     products = window.localStorage.getItem('products') || "null";
     if (products.toString() !== "null") {
       console.log("products found in localStorage");
@@ -337,145 +342,143 @@
         .catch(error => console.error('Error fetching products:', error));
     }
 
-  function createProductCard(product) {
-    const card = document.createElement('a');
-    card.href = product.url;
-    card.target = '_blank';
-    card.className = 'product-card';
+    function createProductCard(product) {
+      const card = document.createElement('a');
+      card.href = product.url;
+      card.target = '_blank';
+      card.className = 'product-card';
 
-    const labelDiv = document.createElement('div');
-    labelDiv.className = 'product-label';
-    product.labelImages.forEach(src => {
-      const img = document.createElement('img');
-      img.src = src;
-      img.alt = '';
-      labelDiv.appendChild(img);
-    });
-    card.appendChild(labelDiv);
+      const labelDiv = document.createElement('div');
+      labelDiv.className = 'product-label';
+      product.labelImages.forEach(src => {
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = '';
+        labelDiv.appendChild(img);
+      });
+      card.appendChild(labelDiv);
 
-    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-    const isFavorited = favorites.some(f => f.id === product.id);
+      const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+      const isFavorited = favorites.some(f => f.id === product.id);
 
-    const favDiv = document.createElement('div');
-    favDiv.className = 'favorite-button';
-    const favBtn = document.createElement('button');
-    const defaultFavSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="23" viewBox="0 0 26 23" fill="none"><g id="Group 3"><g id="heart"><path id="Shape" fill-rule="evenodd" clip-rule="evenodd" d="M22.6339 2.97449C21.4902 1.83033 19.9388 1.1875 18.3211 1.1875C16.7034 1.1875 15.152 1.83033 14.0084 2.97449L12.8332 4.14968L11.658 2.97449C9.27612 0.592628 5.41435 0.592627 3.03249 2.97449C0.650628 5.35635 0.650628 9.21811 3.03249 11.6L4.20769 12.7752L12.8332 21.4007L21.4587 12.7752L22.6339 11.6C23.778 10.4564 24.4208 8.90494 24.4208 7.28723C24.4208 5.66952 23.778 4.11811 22.6339 2.97449Z" stroke="#FF8A00" stroke-width="2.17391" stroke-linecap="round" stroke-linejoin="round"/></g></g></svg>`
-    const hoverFavSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 52 52" fill="none"><path d="M30 30.5H37" stroke="#FF8A00" stroke-width="2" stroke-linecap="round"/><path d="M33.5 27L33.5 34" stroke="#FF8A00" stroke-width="2" stroke-linecap="round"/><circle cx="26" cy="26" r="25" stroke="#FF8A00"/><path fill-rule="evenodd" clip-rule="evenodd" d="M36.6339 17.9745C35.4902 16.8303 33.9388 16.1875 32.3211 16.1875C30.7034 16.1875 29.152 16.8303 28.0084 17.9745L26.8332 19.1497L25.658 17.9745C23.2761 15.5926 19.4144 15.5926 17.0325 17.9745C14.6506 20.3564 14.6506 24.2181 17.0325 26.6L18.2077 27.7752L26.8332 36.4007L35.4587 27.7752L36.6339 26.6C37.778 25.4564 38.4208 23.9049 38.4208 22.2872C38.4208 20.6695 37.778 19.1181 36.6339 17.9745Z" stroke="#FF8A00" stroke-width="2.17391" stroke-linecap="round" stroke-linejoin="round"/><circle cx="33.5" cy="30.5" r="5.5" fill="#FFF7EC"/><path d="M30 30.5H37" stroke="#FF8A00" stroke-width="2" stroke-linecap="round"/><path d="M33.5 27L33.5 34" stroke="#FF8A00" stroke-width="2" stroke-linecap="round"/></svg>`
-    favBtn.innerHTML = isFavorited ? hoverFavSvg : defaultFavSvg;
-    favDiv.appendChild(favBtn);
-    card.appendChild(favDiv);
+      const favDiv = document.createElement('div');
+      favDiv.className = 'favorite-button';
+      const favBtn = document.createElement('button');
+      const defaultFavSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="23" viewBox="0 0 26 23" fill="none"><g id="Group 3"><g id="heart"><path id="Shape" fill-rule="evenodd" clip-rule="evenodd" d="M22.6339 2.97449C21.4902 1.83033 19.9388 1.1875 18.3211 1.1875C16.7034 1.1875 15.152 1.83033 14.0084 2.97449L12.8332 4.14968L11.658 2.97449C9.27612 0.592628 5.41435 0.592627 3.03249 2.97449C0.650628 5.35635 0.650628 9.21811 3.03249 11.6L4.20769 12.7752L12.8332 21.4007L21.4587 12.7752L22.6339 11.6C23.778 10.4564 24.4208 8.90494 24.4208 7.28723C24.4208 5.66952 23.778 4.11811 22.6339 2.97449Z" stroke="#FF8A00" stroke-width="2.17391" stroke-linecap="round" stroke-linejoin="round"/></g></g></svg>`
+      const hoverFavSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 52 52" fill="none"><path d="M30 30.5H37" stroke="#FF8A00" stroke-width="2" stroke-linecap="round"/><path d="M33.5 27L33.5 34" stroke="#FF8A00" stroke-width="2" stroke-linecap="round"/><circle cx="26" cy="26" r="25" stroke="#FF8A00"/><path fill-rule="evenodd" clip-rule="evenodd" d="M36.6339 17.9745C35.4902 16.8303 33.9388 16.1875 32.3211 16.1875C30.7034 16.1875 29.152 16.8303 28.0084 17.9745L26.8332 19.1497L25.658 17.9745C23.2761 15.5926 19.4144 15.5926 17.0325 17.9745C14.6506 20.3564 14.6506 24.2181 17.0325 26.6L18.2077 27.7752L26.8332 36.4007L35.4587 27.7752L36.6339 26.6C37.778 25.4564 38.4208 23.9049 38.4208 22.2872C38.4208 20.6695 37.778 19.1181 36.6339 17.9745Z" stroke="#FF8A00" stroke-width="2.17391" stroke-linecap="round" stroke-linejoin="round"/><circle cx="33.5" cy="30.5" r="5.5" fill="#FFF7EC"/><path d="M30 30.5H37" stroke="#FF8A00" stroke-width="2" stroke-linecap="round"/><path d="M33.5 27L33.5 34" stroke="#FF8A00" stroke-width="2" stroke-linecap="round"/></svg>`
+      favBtn.innerHTML = isFavorited ? hoverFavSvg : defaultFavSvg;
+      favDiv.appendChild(favBtn);
+      card.appendChild(favDiv);
 
-    favBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
+      favBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
 
-      let currentFavorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+        let currentFavorites = JSON.parse(localStorage.getItem('favorites') || '[]');
 
-      const found = currentFavorites.find(f => f.id === product.id);
-      if (found) {
-        currentFavorites = currentFavorites.filter(f => f.id !== product.id);
-        favBtn.innerHTML = defaultFavSvg;
-        console.log('Removed from favorites:', product);
+        const found = currentFavorites.find(f => f.id === product.id);
+        if (found) {
+          currentFavorites = currentFavorites.filter(f => f.id !== product.id);
+          favBtn.innerHTML = defaultFavSvg;
+          console.log('Removed from favorites:', product);
+        } else {
+          currentFavorites.push(product);
+          favBtn.innerHTML = hoverFavSvg;
+          console.log('Added to favorites:', product);
+        }
+
+        localStorage.setItem('favorites', JSON.stringify(currentFavorites));
+      });
+
+      const prodImg = document.createElement('img');
+      prodImg.className = 'product-image';
+      prodImg.src = product.img;
+      prodImg.alt = 'Ürün';
+      card.appendChild(prodImg);
+
+      const title = document.createElement('h3');
+      title.className = 'product-title';
+      const titleText = "<strong>" + product.brand + "</strong> - " + product.name;
+      title.innerHTML = titleText;
+      card.appendChild(title);
+
+      const rating = document.createElement('div');
+      rating.className = 'product-rating';
+      rating.textContent = "★★★★★ ";
+      const spanCount = document.createElement('span');
+      spanCount.textContent = 106;
+      rating.appendChild(spanCount);
+      card.appendChild(rating);
+
+      if (product.discount && product.original_price) {
+        const originalPriceRow = document.createElement('div');
+        originalPriceRow.style.display = 'flex';
+        originalPriceRow.style.alignItems = 'center';
+        originalPriceRow.style.gap = '0.5rem';
+
+        const originalPrice = document.createElement('span');
+        originalPrice.textContent = product.original_price;
+        originalPrice.style.textDecoration = 'line-through';
+        originalPrice.style.color = '#7D7D7D';
+        originalPrice.style.fontSize = '1.125rem';
+        originalPrice.style.fontWeight = 'bold';
+
+        const discount = document.createElement('span');
+        discount.className = 'product-discount';
+
+        const discountText = document.createElement('span');
+        discountText.textContent = product.discount;
+
+        const discountArrow = document.createElement('span');
+        discountArrow.innerHTML = '&#x2193;';
+        discountArrow.style.backgroundColor = '#00a365';
+        discountArrow.style.color = 'white';
+        discountArrow.style.borderRadius = '1rem';
+        discountArrow.style.padding = '0.2rem 0.4rem';
+        discountArrow.style.marginLeft = '0.25rem';
+        discountArrow.style.display = 'inline-block';
+
+        discount.appendChild(discountText);
+        discount.appendChild(discountArrow);
+
+        originalPriceRow.appendChild(originalPrice);
+        originalPriceRow.appendChild(discount);
+        card.appendChild(originalPriceRow);
+
+        const price = document.createElement('p');
+        price.className = 'product-price-discounted';
+        price.textContent = product.price;
+        card.appendChild(price);
       } else {
-        currentFavorites.push(product);
-        favBtn.innerHTML = hoverFavSvg;
-        console.log('Added to favorites:', product);
+        const price = document.createElement('p');
+        price.className = 'product-price';
+        price.textContent = product.price;
+        card.appendChild(price);
       }
 
-      localStorage.setItem('favorites', JSON.stringify(currentFavorites));
+      const addToCartBtn = document.createElement('button');
+      addToCartBtn.className = 'add-to-cart-button';
+      addToCartBtn.textContent = 'Sepete Ekle';
+      card.appendChild(addToCartBtn);
+
+      return card;
+    }
+
+    leftArrow = document.querySelector('.left-arrow');
+    rightArrow = document.querySelector('.right-arrow');
+    leftArrow.addEventListener('click', () => {
+      carouselContainer.scrollBy({ left: -carouselContainer.offsetWidth, behavior: 'smooth' });
     });
 
-    const prodImg = document.createElement('img');
-    prodImg.className = 'product-image';
-    prodImg.src = product.img;
-    prodImg.alt = 'Ürün';
-    card.appendChild(prodImg);
+    rightArrow.addEventListener('click', () => {
+      carouselContainer.scrollBy({ left: carouselContainer.offsetWidth, behavior: 'smooth' });
+    });
 
-    const title = document.createElement('h3');
-    title.className = 'product-title';
-    const titleText = "<strong>" + product.brand + "</strong> - " + product.name;
-    title.innerHTML = titleText;
-    card.appendChild(title);
+    const linkGoogleFonts = document.createElement('link');
+    linkGoogleFonts.rel = 'stylesheet';
+    linkGoogleFonts.href = 'https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap';
+    document.head.appendChild(linkGoogleFonts);
+  };
 
-    const rating = document.createElement('div');
-    rating.className = 'product-rating';
-    rating.textContent = "★★★★★ ";
-    const spanCount = document.createElement('span');
-    spanCount.textContent = 106;
-    rating.appendChild(spanCount);
-    card.appendChild(rating);
-
-  if (product.discount && product.original_price) {
-    const originalPriceRow = document.createElement('div');
-    originalPriceRow.style.display = 'flex';
-    originalPriceRow.style.alignItems = 'center';
-    originalPriceRow.style.gap = '0.5rem';
-
-    const originalPrice = document.createElement('span');
-    originalPrice.textContent = product.original_price;
-    originalPrice.style.textDecoration = 'line-through';
-    originalPrice.style.color = '#7D7D7D';
-    originalPrice.style.fontSize = '1.125rem';
-    originalPrice.style.fontWeight = 'bold';
-
-    const discount = document.createElement('span');
-    discount.className = 'product-discount';
-
-    const discountText = document.createElement('span');
-    discountText.textContent = product.discount;
-
-    const discountArrow = document.createElement('span');
-    discountArrow.innerHTML = '&#x2193;';
-    discountArrow.style.backgroundColor = '#00a365';
-    discountArrow.style.color = 'white';
-    discountArrow.style.borderRadius = '1rem';
-    discountArrow.style.padding = '0.2rem 0.4rem';
-    discountArrow.style.marginLeft = '0.25rem';
-    discountArrow.style.display = 'inline-block';
-
-    discount.appendChild(discountText);
-    discount.appendChild(discountArrow);
-
-    originalPriceRow.appendChild(originalPrice);
-    originalPriceRow.appendChild(discount);
-    card.appendChild(originalPriceRow);
-
-    const price = document.createElement('p');
-    price.className = 'product-price-discounted';
-    price.textContent = product.price;
-    card.appendChild(price);
-  } else {
-    const price = document.createElement('p');
-    price.className = 'product-price';
-    price.textContent = product.price;
-    card.appendChild(price);
-  }
-
-    const addToCartBtn = document.createElement('button');
-    addToCartBtn.className = 'add-to-cart-button';
-    addToCartBtn.textContent = 'Sepete Ekle';
-    card.appendChild(addToCartBtn);
-
-    return card;
-  }
-
-  carousel.appendChild(carouselHeader);
-  carousel.appendChild(leftArrow);
-  carousel.appendChild(rightArrow);
-  carousel.appendChild(carouselContainer);
-  container.appendChild(carousel);
-  document.body.appendChild(container);
-
-  leftArrow.addEventListener('click', () => {
-    carouselContainer.scrollBy({ left: -carouselContainer.offsetWidth, behavior: 'smooth' });
-  });
-
-  rightArrow.addEventListener('click', () => {
-    carouselContainer.scrollBy({ left: carouselContainer.offsetWidth, behavior: 'smooth' });
-  });
-
-  const linkGoogleFonts = document.createElement('link');
-  linkGoogleFonts.rel = 'stylesheet';
-  linkGoogleFonts.href = 'https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap';
-  document.head.appendChild(linkGoogleFonts);
+  init();
 })();
