@@ -317,7 +317,8 @@
               name: p.name,
               price: p.price,
               url: p.url,
-              original_price: p.original_price
+              original_price: p.original_price,
+              id: p.id
             };
 
             if (p.original_price > p.price) {
@@ -353,18 +354,14 @@
     card.appendChild(labelDiv);
 
     const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-    const isFavorited = favorites.some(f => f.url === product.url);
+    const isFavorited = favorites.some(f => f.id === product.id);
 
     const favDiv = document.createElement('div');
     favDiv.className = 'favorite-button';
     const favBtn = document.createElement('button');
-    const favIcon = document.createElement('img');
-    favIcon.src = isFavorited
-      ? "https://www.e-bebek.com/assets/svg/active-favorite.svg"
-      : "https://www.e-bebek.com/assets/svg/default-favorite.svg";
-    favIcon.alt = '';
-    favIcon.className = 'heart-icon';
-    favBtn.appendChild(favIcon);
+    const defaultFavSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="23" viewBox="0 0 26 23" fill="none"><g id="Group 3"><g id="heart"><path id="Shape" fill-rule="evenodd" clip-rule="evenodd" d="M22.6339 2.97449C21.4902 1.83033 19.9388 1.1875 18.3211 1.1875C16.7034 1.1875 15.152 1.83033 14.0084 2.97449L12.8332 4.14968L11.658 2.97449C9.27612 0.592628 5.41435 0.592627 3.03249 2.97449C0.650628 5.35635 0.650628 9.21811 3.03249 11.6L4.20769 12.7752L12.8332 21.4007L21.4587 12.7752L22.6339 11.6C23.778 10.4564 24.4208 8.90494 24.4208 7.28723C24.4208 5.66952 23.778 4.11811 22.6339 2.97449Z" stroke="#FF8A00" stroke-width="2.17391" stroke-linecap="round" stroke-linejoin="round"/></g></g></svg>`
+    const hoverFavSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 52 52" fill="none"><path d="M30 30.5H37" stroke="#FF8A00" stroke-width="2" stroke-linecap="round"/><path d="M33.5 27L33.5 34" stroke="#FF8A00" stroke-width="2" stroke-linecap="round"/><circle cx="26" cy="26" r="25" stroke="#FF8A00"/><path fill-rule="evenodd" clip-rule="evenodd" d="M36.6339 17.9745C35.4902 16.8303 33.9388 16.1875 32.3211 16.1875C30.7034 16.1875 29.152 16.8303 28.0084 17.9745L26.8332 19.1497L25.658 17.9745C23.2761 15.5926 19.4144 15.5926 17.0325 17.9745C14.6506 20.3564 14.6506 24.2181 17.0325 26.6L18.2077 27.7752L26.8332 36.4007L35.4587 27.7752L36.6339 26.6C37.778 25.4564 38.4208 23.9049 38.4208 22.2872C38.4208 20.6695 37.778 19.1181 36.6339 17.9745Z" stroke="#FF8A00" stroke-width="2.17391" stroke-linecap="round" stroke-linejoin="round"/><circle cx="33.5" cy="30.5" r="5.5" fill="#FFF7EC"/><path d="M30 30.5H37" stroke="#FF8A00" stroke-width="2" stroke-linecap="round"/><path d="M33.5 27L33.5 34" stroke="#FF8A00" stroke-width="2" stroke-linecap="round"/></svg>`
+    favBtn.innerHTML = isFavorited ? hoverFavSvg : defaultFavSvg;
     favDiv.appendChild(favBtn);
     card.appendChild(favDiv);
 
@@ -374,14 +371,14 @@
 
       let currentFavorites = JSON.parse(localStorage.getItem('favorites') || '[]');
 
-      const found = currentFavorites.find(f => f.url === product.url);
+      const found = currentFavorites.find(f => f.id === product.id);
       if (found) {
-        currentFavorites = currentFavorites.filter(f => f.url !== product.url);
-        favIcon.src = "https://www.e-bebek.com/assets/svg/default-favorite.svg";
+        currentFavorites = currentFavorites.filter(f => f.id !== product.id);
+        favBtn.innerHTML = defaultFavSvg;
         console.log('Removed from favorites:', product);
       } else {
         currentFavorites.push(product);
-        favIcon.src = "https://www.e-bebek.com/assets/svg/active-favorite.svg";
+        favBtn.innerHTML = hoverFavSvg;
         console.log('Added to favorites:', product);
       }
 
