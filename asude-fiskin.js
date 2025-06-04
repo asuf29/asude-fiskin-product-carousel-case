@@ -352,16 +352,41 @@
     });
     card.appendChild(labelDiv);
 
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    const isFavorited = favorites.some(f => f.url === product.url);
+
     const favDiv = document.createElement('div');
     favDiv.className = 'favorite-button';
     const favBtn = document.createElement('button');
     const favIcon = document.createElement('img');
-    favIcon.src = "https://www.e-bebek.com/assets/svg/default-favorite.svg";
+    favIcon.src = isFavorited
+      ? "https://www.e-bebek.com/assets/svg/active-favorite.svg"
+      : "https://www.e-bebek.com/assets/svg/default-favorite.svg";
     favIcon.alt = '';
     favIcon.className = 'heart-icon';
     favBtn.appendChild(favIcon);
     favDiv.appendChild(favBtn);
     card.appendChild(favDiv);
+
+    favBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      let currentFavorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+
+      const found = currentFavorites.find(f => f.url === product.url);
+      if (found) {
+        currentFavorites = currentFavorites.filter(f => f.url !== product.url);
+        favIcon.src = "https://www.e-bebek.com/assets/svg/default-favorite.svg";
+        console.log('Removed from favorites:', product);
+      } else {
+        currentFavorites.push(product);
+        favIcon.src = "https://www.e-bebek.com/assets/svg/active-favorite.svg";
+        console.log('Added to favorites:', product);
+      }
+
+      localStorage.setItem('favorites', JSON.stringify(currentFavorites));
+    });
 
     const prodImg = document.createElement('img');
     prodImg.className = 'product-image';
