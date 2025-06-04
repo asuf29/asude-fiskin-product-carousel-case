@@ -23,7 +23,7 @@ This project is a pixel-perfect product carousel implementation for the [ebebek]
 
 📦 product-carousel-case/ </br>
 └── 📄 index.html </br>
-└── 📄 iscript.js
+└── 📄 script.js
 
 
 All the logic including DOM creation, styling, data fetching, event handling, and responsiveness are included inside the `script.js`.
